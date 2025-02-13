@@ -1,0 +1,4 @@
+theme: jekyll-theme-minimal
+title: cURL to PHP Converter
+description: A modern web tool to convert cURL commands to PHP code
+show_downloads: false
