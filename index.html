@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cURL to PHP Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0d1117;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .gradient-border {
+            position: relative;
+            border-radius: 0.75rem;
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            padding: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .gradient-border:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
+        }
+
+        .gradient-border > div {
+            background: #161b22;
+            border-radius: 0.75rem;
+        }
+
+        .code-output {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 0.75rem;
+            position: relative;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .code-output.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .code-output pre {
+            margin: 0;
+            padding: 1rem;
+            background: transparent;
+        }
+
+        .code-output code {
+            font-family: 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            display: block;
+            overflow-x: auto;
+            background: transparent;
+            color: #e6edf3;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            opacity: 0;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 10;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .code-output:hover .copy-button {
+            opacity: 1;
+        }
+
+        .textarea-curl {
+            background: #0d1117 !important;
+            border: 1px solid #30363d !important;
+            color: #c9d1d9 !important;
+            font-family: 'Consolas', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .textarea-curl:focus {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+
+        .select-method {
+            background: #0d1117 !important;
+            border: 1px solid #30363d !important;
+            color: #c9d1d9 !important;
+            transition: all 0.3s ease;
+        }
+
+        .select-method:focus {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-generate {
+            background: linear-gradient(45deg, #4f46e5, #7c3aed) !important;
+            border: none !important;
+            transition: all 0.3s ease !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-generate:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Header -->
+        <header class="text-center space-y-4 mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+                cURL to PHP Converter
+            </h1>
+            <p class="text-gray-400 text-lg">Convert browser cURL commands to PHP code with ease</p>
+            <div class="flex justify-center gap-2 text-sm text-gray-500">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    Syntax Highlighting
+                </span>
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Multiple Methods
+                </span>
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    Copy to Clipboard
+                </span>
+            </div>
+        </header>
+
+        <!-- Main Form -->
+        <div class="gradient-border">
+            <div class="p-4 md:p-6 space-y-4">
+                <div class="space-y-2">
+                    <label for="curlCommand" class="block text-sm font-medium text-gray-300">Paste cURL Command</label>
+                    <textarea 
+                        id="curlCommand" 
+                        rows="6" 
+                        class="w-full rounded-lg p-3 textarea-curl focus:outline-none"
+                        placeholder="Paste your cURL command here (copied from browser)"></textarea>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="requestMethod" class="block text-sm font-medium text-gray-300">Request Method</label>
+                    <select 
+                        id="requestMethod" 
+                        class="w-full rounded-lg p-3 select-method focus:outline-none">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button 
+                        id="generateBtn"
+                        class="flex-1 py-2 px-4 rounded-lg btn-generate text-white font-medium focus:outline-none">
+                        Generate
+                    </button>
+                    <button 
+                        id="clearBtn"
+                        class="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 focus:outline-none">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div id="outputContainer" class="code-output hidden">
+            <pre><code id="output" class="language-php"></code></pre>
+            <button id="copyBtn" class="copy-button px-3 py-1.5 rounded-md text-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                </svg>
+                Copy Code
+            </button>
+        </div>
+        <footer class="text-center mt-8 text-gray-500 text-sm">
+            <p>Made with <span class="text-red-500">❤</span> by Pratyush • 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const curlInput = document.getElementById('curlCommand');
+            const methodSelect = document.getElementById('requestMethod');
+            const generateBtn = document.getElementById('generateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const outputContainer = document.getElementById('outputContainer');
+            const output = document.getElementById('output');
+
+            generateBtn.addEventListener('click', function() {
+                const curl = curlInput.value;
+                if (!curl) {
+                    alert('Please enter a cURL command');
+                    return;
+                }
+
+                try {
+                    // Basic parsing
+                    let url = '';
+                    const urlMatch = curl.match(/https?:\/\/[^\s'"]+/);
+                    if (urlMatch) {
+                        url = urlMatch[0];
+                    }
+
+                    const headers = [];
+                    const headerMatches = curl.matchAll(/-H\s+(['"])(.*?)\1/g);
+                    for (const match of headerMatches) {
+                        headers.push(match[2]);
+                    }
+
+                    // Parse POST data
+                    let postData = '';
+                    const dataMatch = curl.match(/(?:--data|-d|--data-raw)\s+(['"])(.*?)\1/);
+                    if (dataMatch) {
+                        postData = dataMatch[2];
+                        if (methodSelect.value === 'GET') {
+                            methodSelect.value = 'POST';
+                        }
+                    }
+
+                    // Generate PHP code
+                    const code = [];
+                    code.push(`// HTTP ${methodSelect.value} Request`);
+                    code.push(`// Created by Pratyush`);
+                    code.push(`$curl = curl_init('${url}');`);
+                    
+                    if (headers.length > 0) {
+                        code.push('\n$headers = array();');
+                        headers.forEach(header => {
+                            code.push(`$headers[] = '${header}';`);
+                        });
+                    }
+
+                    code.push('\ncurl_setopt_array($curl, [');
+                    
+                    if (methodSelect.value === 'POST') {
+                        code.push('    CURLOPT_POST => 1,');
+                        if (postData) {
+                            code.push(`    CURLOPT_POSTFIELDS => '${postData}',`);
+                        } else {
+                            code.push('    CURLOPT_POSTFIELDS => array(),');
+                        }
+                    } else if (methodSelect.value !== 'GET') {
+                        code.push(`    CURLOPT_CUSTOMREQUEST => "${methodSelect.value}",`);
+                    }
+                    
+                    if (headers.length > 0) {
+                        code.push('    CURLOPT_HTTPHEADER => $headers,');
+                    }
+
+                    code.push('    CURLOPT_FOLLOWLOCATION => 1,');
+                    code.push('    CURLOPT_RETURNTRANSFER => 1,');
+                    code.push('    CURLOPT_SSL_VERIFYPEER => 0,');
+                    code.push('    CURLOPT_SSL_VERIFYHOST => 0,');
+                    code.push('    CURLOPT_COOKIEFILE => "capture",');
+                    code.push('    CURLOPT_COOKIEJAR => "capture"');
+                    code.push(']);');
+
+                    code.push('\n$exe = curl_exec($curl);');
+                    code.push('curl_close($curl);');
+                    code.push('\necho $exe;');
+
+                    // Display output
+                    output.textContent = code.join('\n');
+                    outputContainer.classList.remove('hidden');
+                    outputContainer.classList.add('show');
+                    Prism.highlightElement(output);
+                } catch (error) {
+                    // Just ignore errors and continue
+                    output.textContent = code.join('\n');
+                    outputContainer.classList.remove('hidden');
+                    outputContainer.classList.add('show');
+                    Prism.highlightElement(output);
+                }
+            });
+
+            clearBtn.addEventListener('click', function() {
+                curlInput.value = '';
+                methodSelect.value = 'GET';
+                outputContainer.classList.remove('show');
+                setTimeout(() => {
+                    outputContainer.classList.add('hidden');
+                    output.textContent = '';
+                }, 300);
+            });
+
+            copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(output.textContent)
+                    .then(() => {
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Copied!';
+                        setTimeout(() => copyBtn.innerHTML = originalText, 1000);
+                    })
+                    .catch(() => alert('Failed to copy'));
+            });
+        });
+    </script>
+</body>
+</html>
